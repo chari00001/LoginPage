@@ -19,7 +19,19 @@ app.get('/', (req, res, next) => {
     res.send('Sanity check')
 })
 
+app.use((req, res, next) => {
+    if(req.query.message === 'fail'){
+        res.locals.message = `Sorry. This username and password combination does not exist`
+    } else {
+        res.locals.message = ``
+    }
+    next()
+})
+
 app.get('/login', (req, res, next) => {
+    // the req object has a query property in Express
+    // req.query is an object with a prop of every key in the query string
+    // console.log(req.query);
     res.render('login')
 })
 
@@ -46,7 +58,8 @@ app.post('/process_login', (req, res, next) => {
          */
         res.redirect('/welcome')
     } else {
-        res.redirect('/login?message=fail')
+        // the "? is a special character in a URL"
+        res.redirect('/login?message=fail&test=hello')
     }
 
     // res.send(req.body)
@@ -58,6 +71,42 @@ app.get('/welcome', (req, res, next) => {
         username: req.cookies.username
     })
 })
+
+/**
+ * app.param takes 2 args:
+ * 1. parameter to look for in the route
+ * 2. the callback to run (with the usuals)
+ */
+
+app.param('id', (req, res, next, id) => {
+    console.log("Params called:", id);
+    // if id has something to do with stories...
+    // if id has something to do with blogs...
+    next()
+})
+
+/**
+ *  In a route, anytime something has a : in front it is a wildcard.
+ *  Wildcard will match anything in that slot
+ */
+app.get('/story/:id', (req, res, next) => {
+    /**
+     * the req.params object always exists
+     * it will have a prop for each wildcard in the route
+     */
+    res.send(`<h1>Story ${req.params.storyId}</h1>`)
+    // res.send('<h1>Story 1</h1>')
+})
+
+// THIS WILL NEVER RUN, because it matches above
+// app.get('/story/:blogId/:link', (req, res, next) => {
+//     /**
+//      * the req.params object always exists
+//      * it will have a prop for each wildcard in the route
+//      */
+//     res.send(`<h1>Story ${req.params.storyId} - ${req.params.link}</h1>`)
+//     // res.send('<h1>Story 1</h1>')
+// })
 
 app.get('/logout', (req, res, next) => {
     /**
