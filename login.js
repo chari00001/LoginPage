@@ -108,6 +108,39 @@ app.get('/story/:id', (req, res, next) => {
 //     // res.send('<h1>Story 1</h1>')
 // })
 
+app.get('/statement', (req, res, next) => {
+    // This will render the statement in the browser
+    // res.sendFile(path.join(__dirname, 'userStatements/BankStatementChequing.png'))
+    /** app has download method. it takes 2 args
+     * 1. filename
+     * 2. optionally, what you want the filename to download as
+     * 3. callback which comes with the error
+     */
+
+    /**
+     * download is setting the headers
+     * 1. content-disposition to attachment, with filename of the 2nd arg
+     */
+    res.download(path.join(__dirname, 'userStatements/BankStatementChequing.png'), 'statement.png', () => {
+        // if there is an error in sending the file, headers already be sent
+        if(error){
+            // res.headersSent is a bool. true if headers are already sent
+            if(!res.headersSent){
+                res.redirect('/download/error')
+            }
+        }
+    })
+
+    // attachment ONLY sets the headers for content-disposition to attachment
+    // IF you provide a file, it will also set the filename.
+
+    // res.attachment(path.join(__dirname, 'userStatements/BankStatementChequing.png'), 'statement.png')
+
+    // Alternative
+    // res.set('Content-Disposition', 'attachment') 
+    // res.sendFile
+})
+
 app.get('/logout', (req, res, next) => {
     /**
      * res.clearCookie takes 1 arg:
